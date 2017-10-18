@@ -35,6 +35,10 @@ class Heap {
   // number of elements in the given range.
   template<typename InputIterator>
   Heap(InputIterator begin, InputIterator end);
+  // Creates heap from the given elements. The given order of elements is not
+  // required to form a heap. Complexity is linear for the number of elements
+  // provided.
+  template<typename... Ts> Heap(Ts&&... args);
 
   // Main mechanism used for storing and retrieving data in the heap.
   bool Empty() const;
