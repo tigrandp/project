@@ -81,7 +81,8 @@ class Heap {
   template<typename InputIterator>
   void Assign(InputIterator begin, InputIterator end);
 
-  // Remove the element from the heap.
+  // Remove the element from the heap. Complexity is linear to the number of
+  // elements int the heap.
   void Remove(Iterator pos);
 
   // Rebuild a heap base on the given comparator.
@@ -103,11 +104,14 @@ class Heap {
   // Returns the left child of the given node.
   int Left(int index) { return (index << 1) | 1; }
   // Returns the rigth child of the given node.
-  inline int Rigth(int index) { return (index + 1) << 1; }
+  int Rigth(int index) { return (index + 1) << 1; }
+  // Returns the parent of the given node.
+  int Parent(int index) { return (index - 1) >> 1; }
+  // Pushes element up to the tree until it finds it place in the heap.
+  void Elevate(int index);
 
   int max_size_;
   Vector heap_;
-  Comparator comparator_;
 };
 
 template<typename T, typename Comparator, typename Vector>
@@ -229,6 +233,30 @@ Heap<T, Comparator, Vector>::ConsumeTop() {
   ValueType top = Top();
   Pop();
   return top;
+}
+
+template<typename T, typename Comparator, typename Vector>
+bool Heap<T, Comparator, Vector>::Push(const ValueType& item) {
+  return PushInternal(item);
+}
+
+template<typename T, typename Comparator, typename Vector>
+bool Heap<T, Comparator, Vector>::Push(ValueType&& item) {
+  return PushInternal(item);
+}
+
+template<typename T, typename Comparator, typename Vector>
+template<typename Arg>
+bool Heap<T, Comparator, Vector>::PushInternal(Arg&& item) {
+  if (max_size_ > 0 && Size() >= max_size_) {
+    if (!Comparator()(item, Top())) {
+      return false;
+    }
+    Pop();
+  }
+  heap_.push_back(std::forward<Arg>(item));
+  Elevate(heap_.size() - 1);
+  return true;
 }
 
 }  // namespace ds
