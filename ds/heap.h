@@ -19,14 +19,14 @@ namespace ds {
 
 template<typename T,
          typename Comparator = std::less<T>,
-         typename Container = std::vector<T>>
+         typename Vector = std::vector<T>>
 class Heap {
  public:
   typedef T ValueType;
   typedef T& Reference;
   typedef const T& ConstReference;
-  typedef typename Container::iterator Iterator;
-  typedef typename Container::const_iterator ConstIterator;
+  typedef typename Vector::iterator Iterator;
+  typedef typename Vector::const_iterator ConstIterator;
 
   // Creates empty heap.
   Heap();
@@ -73,7 +73,7 @@ class Heap {
   // Replace elements in the heap with the ones in new elements. After the
   // operation, new_elements will contain the old heap elements, and the order
   // of elements in the heap will be restored.
-  void ReplaceElements(Container* new_elements);
+  void ReplaceElements(Vector* new_elements);
 
   // Replace the contents of the heap by the elements in [begin, end) and
   // rebuilds the heap.
@@ -96,8 +96,91 @@ class Heap {
   ConstIterator End() const;
 
  private:
-  Container heap_;
+  // Recursively restores the heap order, as if the three was rooted at the
+  // given index.
+  void Heapify(int index);
+  // Returns the left child of the given node.
+  int Left(int index) { return (index << 1) | 1; }
+  // Returns the rigth child of the given node.
+  inline int Rigth(int index) { return (index + 1) << 1; }
+
+  int max_size_;
+  Vector heap_;
+  Comparator comparator_;
 };
+
+template<typename T, typename Comparator, typename Vector>
+Heap<T, Comparator, Vector>::Heap() : max_size_(-1) {}
+
+template<typename T, typename Comparator, typename Vector>
+template<typename InputIterator>
+Heap<T, Comparator, Vector>::Heap(InputIterator begin, InputIterator end) {
+  heap_.clear();
+  heap_.reserve(std::distance(begin, end));
+  for (InputIterator it = begin; it != end; ++it) {
+    heap_.push_back(*it);
+  }
+  Rebuild();
+}
+
+template<typename T, typename Comparator, typename Vector>
+template<typename... Ts> Heap<T, Comparator, Vector>::Heap(Ts&&... args) {
+  heap_.clear();
+  heap_ = {std::forward<Ts>(args)...};
+  Rebuild();
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::Rebuild() {
+  int num_elements = heap_.size();
+  for (int i = num_elements / 2; i >= 0; --i) {
+    Heapify(i);
+  }
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::Heapify(int index) {
+  int largest_index = index;
+  int left_child_index = Left(index);
+  if (left_child_index < heap_.size() &&
+      !comparator_(heap_.at(largest_index), heap_.at(left_child_index))) {
+    largest_index = left_child_index;
+  }
+  int rigth_child_index = Rigth(index);
+  if (rigth_child_index < heap_.size() &&
+      !comparator_(heap_.at(largest_index), heap_.at(rigth_child_index))) {
+    largest_index = rigth_child_index;
+  }
+  using std::swap;
+  if (largest_index != index) {
+    swap(heap_.at(largest_index), heap_.at(index));
+    Heapify(largest_index);
+  }
+}
+
+template<typename T, typename Comparator, typename Vector>
+typename Heap<T, Comparator, Vector>::Iterator
+Heap<T, Comparator, Vector>::Begin() {
+  return heap_.begin();
+}
+
+template<typename T, typename Comparator, typename Vector>
+typename Heap<T, Comparator, Vector>::Iterator
+Heap<T, Comparator, Vector>::End() {
+  return heap_.end();
+}
+
+template<typename T, typename Comparator, typename Vector>
+typename Heap<T, Comparator, Vector>::ConstIterator
+Heap<T, Comparator, Vector>::Begin() const {
+  return heap_.begin();
+}
+
+template<typename T, typename Comparator, typename Vector>
+typename Heap<T, Comparator, Vector>::ConstIterator
+Heap<T, Comparator, Vector>::End() const {
+  return heap_.end();
+}
 
 }  // namespace ds
 
