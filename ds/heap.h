@@ -12,6 +12,7 @@
 #ifndef DS_HEAP_H_
 #define DS_HEAP_H_
 
+#include <cassert>
 #include <iterator>
 #include <vector>
 
@@ -180,6 +181,54 @@ template<typename T, typename Comparator, typename Vector>
 typename Heap<T, Comparator, Vector>::ConstIterator
 Heap<T, Comparator, Vector>::End() const {
   return heap_.end();
+}
+
+template<typename T, typename Comparator, typename Vector>
+bool Heap<T, Comparator, Vector>::Empty() const {
+  return heap_.empty();
+}
+
+template<typename T, typename Comparator, typename Vector>
+std::size_t Heap<T, Comparator, Vector>::Size() const {
+  return heap_.size();
+}
+
+template<typename T, typename Comparator, typename Vector>
+typename Heap<T, Comparator, Vector>::ConstReference
+Heap<T, Comparator, Vector>::Top() const {
+  // TODO(tigrandp): Change to LOG when ready instead of assert.
+  assert(!heap_.empty());
+  return heap_.front();
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::Pop() {
+  // TODO(tigrandp): Change to LOG when ready instea of assert.
+  assert(!heap_.empty());
+  using std::swap;
+  swap(heap_[0], heap_.back());
+  // The top element now at the end, we can remove it.
+  heap_.pop_back();
+  // If the removed element was the last one we have nothing left to do.
+  if (heap_.empty()) return;
+  // Restoring the heap invariant.
+  Heapify(0);
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::Clear() {
+  heap_.erase(heap_.begin(), heap_.end());
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::SetMax(int size) { max_size_ = size; }
+
+template<typename T, typename Comparator, typename Vector>
+typename Heap<T, Comparator, Vector>::ValueType
+Heap<T, Comparator, Vector>::ConsumeTop() {
+  ValueType top = Top();
+  Pop();
+  return top;
 }
 
 }  // namespace ds
