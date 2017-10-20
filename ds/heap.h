@@ -67,9 +67,6 @@ class Heap {
   bool Push(const ValueType& item);
   // Just as above but instead of copying element into the heap it moves.
   bool Push(ValueType&& item);
-  // Just as above but instead of copying/moving it creates element in place.
-  template<typename... Ts>
-  ValueType& Emplace(Ts&&... args);
 
   // Replace elements in the heap with the ones in new elements. After the
   // operation, new_elements will contain the old heap elements, and the order
@@ -109,6 +106,7 @@ class Heap {
   int Parent(int index) { return (index - 1) >> 1; }
   // Pushes element up to the tree until it finds it place in the heap.
   void Elevate(int index);
+  template<typename Arg> bool PushInternal(Arg&& item);
 
   int max_size_;
   Vector heap_;
@@ -148,12 +146,12 @@ void Heap<T, Comparator, Vector>::Heapify(int index) {
   int largest_index = index;
   int left_child_index = Left(index);
   if (left_child_index < heap_.size() &&
-      !comparator_(heap_.at(largest_index), heap_.at(left_child_index))) {
+      !Comparator()(heap_.at(largest_index), heap_.at(left_child_index))) {
     largest_index = left_child_index;
   }
   int rigth_child_index = Rigth(index);
   if (rigth_child_index < heap_.size() &&
-      !comparator_(heap_.at(largest_index), heap_.at(rigth_child_index))) {
+      !Comparator()(heap_.at(largest_index), heap_.at(rigth_child_index))) {
     largest_index = rigth_child_index;
   }
   using std::swap;
@@ -207,7 +205,7 @@ Heap<T, Comparator, Vector>::Top() const {
 
 template<typename T, typename Comparator, typename Vector>
 void Heap<T, Comparator, Vector>::Pop() {
-  // TODO(tigrandp): Change to LOG when ready instea of assert.
+  // TODO(tigrandp): Change to LOG when ready instead of assert.
   assert(!heap_.empty());
   using std::swap;
   swap(heap_[0], heap_.back());
@@ -242,7 +240,7 @@ bool Heap<T, Comparator, Vector>::Push(const ValueType& item) {
 
 template<typename T, typename Comparator, typename Vector>
 bool Heap<T, Comparator, Vector>::Push(ValueType&& item) {
-  return PushInternal(item);
+  return PushInternal(std::move(item));
 }
 
 template<typename T, typename Comparator, typename Vector>
@@ -257,6 +255,38 @@ bool Heap<T, Comparator, Vector>::PushInternal(Arg&& item) {
   heap_.push_back(std::forward<Arg>(item));
   Elevate(heap_.size() - 1);
   return true;
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::Elevate(int index) {
+  using std::swap;
+  // While we can push the current element higher in the tree.
+  while (index > 0 && Comparator()(heap_.at(index), heap_.at(Parent(index)))) {
+    std::swap(heap_.at(index), heap_.at(Parent(index)));
+    index = Parent(index);
+  }
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::ReplaceElements(Vector* new_elements) {
+  heap_.swap(*new_elements);
+  Rebuild();
+}
+
+template<typename T, typename Comparator, typename Vector>
+template<typename InputIterator>
+void Heap<T, Comparator, Vector>::Assign(InputIterator begin,
+                                         InputIterator end) {
+  heap_.assign(begin, end);
+  Rebuild();
+}
+
+template<typename T, typename Comparator, typename Vector>
+void Heap<T, Comparator, Vector>::Remove(Iterator it) {
+  // TODO(tigrandp): Change to LOG when ready instead of assert.
+  assert(!heap_.empty());
+  heap_.erase(it);
+  Rebuild();
 }
 
 }  // namespace ds
