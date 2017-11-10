@@ -51,5 +51,21 @@ TEST(BitsTest, GetsSumByModuloForLongs) {
             AddByModulo(18189191871LL, 28228229211LL, 30929229291LL));
 }
 
+TEST(BitsTest, RoundsUpNonePowerOfTwoIntegerToClosestNumberTest) {
+  EXPECT_EQ(4096, RoundUpToPowerOfTwo(4012));
+}
+
+TEST(BitsTest, RoundsUpPowerOfTwoIntegerToClosestNumberTest) {
+  EXPECT_EQ(8192, RoundUpToPowerOfTwo(8192));
+}
+
+TEST(BitsTest, RoundsUpNonePowerOfTwoLongToClosestNumberTest) {
+  EXPECT_EQ(17179869184, RoundUpToPowerOfTwo(17179869174LL));
+}
+
+TEST(BitsTest, RoundsUpPowerOfTwoLongToClosestNumberTest) {
+  EXPECT_EQ(549755813888LL, RoundUpToPowerOfTwo(549755813888LL));
+}
+
 }  // namespace
 }  // namespace algorithms
