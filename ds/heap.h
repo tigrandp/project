@@ -9,6 +9,7 @@
 //   of pointers for efficiency.
 //   - In constrast of STL heap, it provides iterator mechanism for more
 //   efficient element removal.
+
 #ifndef DS_HEAP_H_
 #define DS_HEAP_H_
 
