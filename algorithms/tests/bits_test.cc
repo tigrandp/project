@@ -67,5 +67,9 @@ TEST(BitsTest, RoundsUpPowerOfTwoLongToClosestNumberTest) {
   EXPECT_EQ(549755813888LL, RoundUpToPowerOfTwo(549755813888LL));
 }
 
+TEST(BitsTest, GetsTheLowestBitMask) {
+  EXPECT_EQ(32, GetLowestBitMask(272928));
+}
+
 }  // namespace
 }  // namespace algorithms
