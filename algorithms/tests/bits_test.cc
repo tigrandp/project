@@ -42,5 +42,14 @@ TEST(BitsTest, GetsMinimumOfZero) {
   EXPECT_EQ(0, Min(0, 9));
 }
 
+TEST(BitsTest, GetsSumByModuloForIntegers) {
+  EXPECT_EQ(1635, AddByModulo(11728, 28290, 38383));
+}
+
+TEST(BitsTest, GetsSumByModuloForLongs) {
+  EXPECT_EQ(15488191791LL,
+            AddByModulo(18189191871LL, 28228229211LL, 30929229291LL));
+}
+
 }  // namespace
 }  // namespace algorithms
