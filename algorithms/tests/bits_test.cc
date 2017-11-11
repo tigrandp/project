@@ -71,5 +71,10 @@ TEST(BitsTest, GetsTheLowestBitMask) {
   EXPECT_EQ(32, GetLowestBitMask(272928));
 }
 
+TEST(BitsTest, CountsTheNumberOfBitsInNumber) {
+  EXPECT_EQ(5, PopCount(31));
+  EXPECT_EQ(2, PopCount(10));
+}
+
 }  // namespace
 }  // namespace algorithms
