@@ -160,6 +160,7 @@ TEST(HeapTest, MovesElementToNoneFullHeapTest) {
   heap.Push(std::move(to_move));
 
   EXPECT_EQ(5, heap.Size());
+  EXPECT_DEATH(heap.Size(), "asd");
   EXPECT_EQ(-1, *heap.Top());
 }
 
