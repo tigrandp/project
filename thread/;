@@ -15,10 +15,6 @@ namespace thread {
 // for current thread of execution. If mutex from higher level is acquired
 // after locking mutex from lower level, program execution will be halted. The
 // first lock of the current thread will always succeed.
-// NOTE: user always should make sure that mutexes in hierarchy are unlocked in
-// exact reverse order of locking. For example it is fine to rely on stack
-// unwinding but if mutexes are placed in some containers the order should be
-// preserved otherwise program will be halted.
 // HierarchicalMutex class meets all the requirements of BasicLocable and can
 // be used with std threading facilities.
 //
