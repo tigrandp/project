@@ -18,12 +18,13 @@
 
 namespace threading {
 namespace {
-namespace helpers {
 
 using thread::HierarchicalMutex;
 using Mutex = HierarchicalMutex<std::mutex>;
-using Mutexes = std::map<int, std::unique_ptr<Mutex>>; 
+using Mutexes = std::map<int, std::unique_ptr<Mutex>>;
 using Locks = std::map<int, std::unique_ptr<std::unique_lock<Mutex>>>;
+
+namespace helpers {
 
 struct LockInstruction {
   enum Command {LOCK, UNLOCK};
@@ -186,6 +187,20 @@ TEST(HierarchicalMutexTest, MultipleThreadsConfflicts) {
   // succeed.
   LaunchLockThreadWithParamsAndWait(
       {instructions_t1, instructions_t2, instructions_t3}, time_out, delta);
+}
+
+// Test which makes sure that stack unwinding works fine.
+TEST(HierarchicalMutex, ReliesOnStackUnwinding) {
+  Mutex m5(5);
+  std::lock_guard<Mutex> l5(m5);
+
+  {
+    Mutex m3(3);
+    std::lock_guard<Mutex> l3(m3);
+  }
+
+  Mutex m4(4);
+  std::lock_guard<Mutex> l4(m4);
 }
 
 }  // namespace
