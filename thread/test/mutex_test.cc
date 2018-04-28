@@ -16,10 +16,9 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace threading {
+namespace thread {
 namespace {
 
-using thread::HierarchicalMutex;
 using Mutex = HierarchicalMutex<std::mutex>;
 using Mutexes = std::map<int, std::unique_ptr<Mutex>>;
 using Locks = std::map<int, std::unique_ptr<std::unique_lock<Mutex>>>;
@@ -204,4 +203,4 @@ TEST(HierarchicalMutex, ReliesOnStackUnwinding) {
 }
 
 }  // namespace
-}  // namespace threading
+}  // namespace thread

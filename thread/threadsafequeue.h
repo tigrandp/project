@@ -1,12 +1,15 @@
 #ifndef THREAD_THREADSAFEQUEUE_H_
 #define THREAD_THREADSAFEQUEUE_H_
 
+#include <deque>
+#include <mutex>
+
 namespace thread {
 
 // Queue which synchronizes all the operations using only locking.
 // Queue semantics are provided by PushBack/PopFront, stack semantics by
 // PushBack/PopBack. All functions are atomic.
-template<typename T> SynchronizedQueue {
+template<typename T> class SynchronizedQueue {
  public:
   using ValueType = T;
   using ContainerType = std::deque<T>;
@@ -58,11 +61,11 @@ bool SynchronizedQueue<T>::PopBack(ValueType* top) {
 }
 
 template<typename T>
-bool SynchronizedQueue<T>::PopFont(ValueType* front) {
+bool SynchronizedQueue<T>::PopFront(ValueType* front) {
   std::lock_guard<std::mutex> lk(m_);
   if (elements_.empty()) return false;
   *front = elements_.front();
-  element_.pop_front();
+  elements_.pop_front();
   return true;
 }
 
